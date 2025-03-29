@@ -13,18 +13,6 @@ const far = 10;
 (function main() {
   init();
 
-  const light1 = new THREE.DirectionalLight(0xffffff, 10);
-  light1.position.set(5, 10, 5); // Pastikan cahaya ada di posisi yang sesuai
-  scene.add(light1);
-
-  const light2 = new THREE.DirectionalLight(0xffffff, 10);
-  light2.position.set(-5, 10, 5); // Pastikan cahaya ada di posisi yang sesuai
-  scene.add(light2);
-
-  const light3 = new THREE.DirectionalLight(0xffffff, 10);
-  light2.position.set(0, -10, 5); // Pastikan cahaya ada di posisi yang sesuai
-  scene.add(light3);
-
   camera.position.z = 6;
 
   loader = new GLTFLoader();
@@ -39,9 +27,22 @@ const far = 10;
 
       model = gltf.scene;
 
+      model.traverse((child) => {
+        if (child.isMesh) {
+          child.material.side = THREE.DoubleSide; // Render both front and back
+        }
+      });
+
+      model.traverse((child) => {
+        if (child.isMesh) {
+          child.geometry.computeVertexNormals();
+        }
+      });
+
+
       scene.add(gltf.scene);
 
-      // changeTexture(model, '/texture/coke.jpg');
+      changeTexture(model, '/texture/coke3.jpg');
 
       const animations = gltf.animations;
 
@@ -50,7 +51,9 @@ const far = 10;
       console.log(action);
       action.play();
 
-      scrollAction();
+      onScrollAction();
+
+      animateText();
 
       function animate() {
         mixer.update(0.015);
@@ -85,12 +88,15 @@ function init() {
   document.body.prepend(renderer.domElement);
 
   // control = new OrbitControls(camera, renderer.domElement);
+
+  setupLights();
 }
 
 function changeTexture(model, texturePath) {
   const textureLoader = new THREE.TextureLoader();
 
   textureLoader.load(texturePath, (texture) => {
+    texture.flipY = false;
     model.traverse((child) => {
       if (child.isMesh) {
         child.material.map = texture;
@@ -100,7 +106,7 @@ function changeTexture(model, texturePath) {
   });
 }
 
-function scrollAction() {
+function onScrollAction() {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.trigger1',
@@ -144,30 +150,88 @@ function scrollAction() {
   })
 
   tl3.to(model.rotation, {
-    z: model.rotation.z + Math.PI * 2, // 360 degrees
+    z: model.rotation.z + Math.PI * 2 - 0.2, // 360 degrees
     duration: 5,
     ease: "power2.inOut"
   });
 
   tl3.to(model.position, {
     x: 2.5,     // Move on x-axis
-    y: -1,     // Move on y-axis
-    z: 2,    // Move on z-axis
+    y: -0.5,     // Move on y-axis
+    z: 1.6,    // Move on z-axis
     duration: 5,
   }, "<");
+
+  const targetPosition = camera.position.clone();
+  targetPosition.z -= 3
+
+  const tl4 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.trigger4',
+      start: '5% bottom',
+      end: '50% bottom',
+      scrub: true,
+    }
+  })
+
+  tl4.to(model.position, {
+    x: targetPosition.x,
+    y: targetPosition.y,
+    z: targetPosition.z,
+    duration: 5,
+  });
+
+
+  tl4.to(model.rotation, {
+    x: "+=6.28", // 1 putaran penuh (2 * Math.PI)
+    z: "+=6.28", // Bisa juga putar di sumbu Z
+    duration: 5,
+  }, "<"); // Memulai animasi rotasi bersamaan
 
 
   // parallax
   gsap.to("#parallaxShare", {
-    y: "-5%", // Adjust the intensity of the parallax effect
+    y: "-5%",
     ease: "none",
     scale: 1.2,
     scrollTrigger: {
       trigger: "#parallaxShare",
-      start: "top bottom",  // When the image enters the viewport
+      start: "top bottom",
       end: "bottom top",
-      scrub: 1 // Smooth effect
+      scrub: 1
     }
   });
 
+}
+
+function setupLights() {
+  const light1 = new THREE.DirectionalLight(0xffffff, 10);
+  light1.position.set(5, 10, 5); // Pastikan cahaya ada di posisi yang sesuai
+  scene.add(light1);
+
+  const light2 = new THREE.DirectionalLight(0xffffff, 10);
+  light2.position.set(-5, 10, 5); // Pastikan cahaya ada di posisi yang sesuai
+  scene.add(light2);
+
+  const light3 = new THREE.DirectionalLight(0xffffff, 10);
+  light2.position.set(0, -10, 5); // Pastikan cahaya ada di posisi yang sesuai
+  scene.add(light3);
+}
+
+function animateText() {
+  const textTl = gsap.timeline();
+
+  textTl.to(".brand1", {
+    y: "-=15",
+    duration: 0.5,
+    ease: "power2.inOut"
+  }).to(".tagline1", {
+    y: "-=15",
+    duration: 0.5,
+    ease: "power2.inOut"
+  }).to(".tagline2", {
+    y: "-=15",
+    duration: 0.5,
+    ease: "power2.inOut"
+  });
 }
