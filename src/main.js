@@ -1,16 +1,15 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-let control, loader, camera, model, scene, renderer, mixer;
+let loader, camera, model, scene, renderer, mixer;
 
 const fov = 65;
 const near = 1;
 const far = 10;
 
-(function main() {
+function main() {
   init();
 
   camera.position.z = 6;
@@ -19,7 +18,7 @@ const far = 10;
 
   loader.load(
     // resource URL
-    '/model/can10jul.glb',
+    '/3d-pemweb/model/can10jul.glb',
     // called when the resource is loaded
     function (gltf) {
       gltf.scene.scale.set(3.3, 3.3, 3.3);
@@ -42,7 +41,7 @@ const far = 10;
 
       scene.add(gltf.scene);
 
-      changeTexture(model, '/texture/coke3.jpg');
+      changeTexture(model, '/3d-pemweb/texture/coke3.jpg');
 
       const animations = gltf.animations;
 
@@ -75,7 +74,7 @@ const far = 10;
     }
   );
 
-})();
+};
 
 function init() {
   gsap.registerPlugin(ScrollTrigger);
@@ -86,8 +85,6 @@ function init() {
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.prepend(renderer.domElement);
-
-  // control = new OrbitControls(camera, renderer.domElement);
 
   setupLights();
 }
@@ -234,4 +231,8 @@ function animateText() {
     duration: 0.5,
     ease: "power2.inOut"
   });
+}
+
+if (window.matchMedia("(min-width: 1024px)").matches) {
+  main();
 }
