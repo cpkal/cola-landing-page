@@ -18,7 +18,7 @@ function main() {
 
   loader.load(
     // resource URL
-    '/3d-pemweb/model/can10jul.glb',
+    '/cola-landing-page/model/can10jul.glb',
     // called when the resource is loaded
     function (gltf) {
       gltf.scene.scale.set(3.3, 3.3, 3.3);
@@ -41,7 +41,7 @@ function main() {
 
       scene.add(gltf.scene);
 
-      changeTexture(model, '/3d-pemweb/texture/coke3.jpg');
+      changeTexture(model, '/cola-landing-page/texture/coke3.jpg');
 
       const animations = gltf.animations;
 
